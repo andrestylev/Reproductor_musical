@@ -1,0 +1,73 @@
+{
+  "Artistas": [
+    {
+      "Nombre": "Bad Bunny",
+      "Tipo": "Solista",
+      "Pais": "Puerto Rico",
+      "Canciones": [
+        {
+          "Titulo": "Callaita",
+          "Duracion": "4:12",
+          "Año": "2019",
+          "Genero": "Reggaeton"
+        },
+        {
+          "Titulo": "Titi me preguntó",
+          "Duracion": "4:04",
+          "Año": "2022",
+          "Genero": "Reggaeton"
+        }
+      ]
+    },
+    {
+      "Nombre": "Feid",
+      "Tipo": "Solista",
+      "Pais": "Colombia",
+      "Canciones": [
+        {
+          "Titulo": "Amor de mi vida",
+          "Duracion": "3:11",
+          "Año": "2021",
+          "Genero": "Reggaeton"
+        },
+        {
+          "Titulo": "La Pasamos cabrón",
+          "Duracion": "3:49",
+          "Año": "2021",
+          "Genero": "Reggaeton"
+        },
+        {
+          "Titulo": "Si tu supieras",
+          "Duracion": "3:16",
+          "Año": "2021",
+          "Genero": "Reggaeton"
+        }
+      ]
+    },
+	{
+      "Nombre": "Karol G",
+      "Tipo": "Solista",
+      "Pais": "Colombia",
+      "Canciones": [
+        {
+          "Titulo": "Ay Dios mio",
+          "Duracion": "3:13",
+          "Año": "2021",
+          "Genero": "Reggaeton"
+        },
+        {
+          "Titulo": "Bichota",
+          "Duracion": "2:57",
+          "Año": "2020",
+          "Genero": "Reggaeton"
+        },
+        {
+          "Titulo": "Sejodioto",
+          "Duracion": "3:07",
+          "Año": "2021",
+          "Genero": "Reggaeton"
+        }
+      ]
+    }
+  ]
+}

@@ -11,7 +11,9 @@
           "duracion": "2:48",
           "anio": "1970",
           "genero": "Heavy Metal",
-          "nombreArchivo": "musica/Black Sabbath - Paranoid.mp3"
+          "nombreArchivo": "musica/Black Sabbath - Paranoid.mp3",
+          "letra": "Lyrics/paranoid.txt"
+
         },
         {
           "titulo": "Iron Man",

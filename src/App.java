@@ -15,6 +15,7 @@ public class App {
     private JLabel lblImagen;
     private JButton btnPlayPause;
     private JButton btnStop;
+    private JButton lyrics;
 
     // json cargador
     public App() {
@@ -75,9 +76,9 @@ public class App {
 
                 if (obj instanceof Artista)
                     setText(((Artista) obj).getNombre());
-                else if (obj instanceof Cancion)
+                else if (obj instanceof Cancion) {
                     setText(((Cancion) obj).getTitulo());
-                else
+                } else
                     setText(obj == null ? "" : obj.toString());
                 // colores y fuentes de los nodos
                 setOpaque(true);
@@ -134,6 +135,10 @@ public class App {
         info.add(lblAnio);
         info.add(Box.createVerticalStrut(6));
         info.add(lblArtista);
+
+        //lyrics = crearBoton("Lyrics", e -> verLetras());
+        //lyrics.setLayout(new FlowLayout(FlowLayout.RIGHT, 18, 7));
+        //info.add(lyrics);
 
         right.add(info, BorderLayout.NORTH);
 

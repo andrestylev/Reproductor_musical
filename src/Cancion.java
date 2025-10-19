@@ -4,15 +4,24 @@ public class Cancion {
     private String anio;
     private String Genero;
     private String nombreArchivo;
+    private String letra;
 
     public Cancion() {}
 
-    public Cancion(String Titulo, String Duracion, String anio, String Genero, String nombreArchivo) {
+    public Cancion(String Titulo, String Duracion, String anio, String Genero, String nombreArchivo, String letra) {
         this.Titulo = Titulo;
         this.Duracion = Duracion;
         this.anio = anio;
         this.Genero = Genero;
         this.nombreArchivo = nombreArchivo;
+        this.letra = letra;
+    }
+
+    public String getLetra() {
+        return letra;
+    }
+    public void setLetra(String letra) {
+        this.letra = letra;
     }
     public String getTitulo() {
         return Titulo;

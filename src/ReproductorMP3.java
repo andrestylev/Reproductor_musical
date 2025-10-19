@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 /**
- * ReproductorMP3 con estado sincronizado (STOPPED, PLAYING, PAUSED).
- * Maneja pause/resume de forma robusta evitando que los hilos sobrescriban el estado.
+ * ReproductorMP3 robusto con estado (STOPPED, PLAYING, PAUSED).
+ * Soporta play/pause/resume/stop con protecciones contra condiciones de carrera.
  */
 public class ReproductorMP3 {
 
@@ -26,7 +26,7 @@ public class ReproductorMP3 {
     // ---------- PLAY ----------
     public synchronized void play(String rutaArchivo) {
         System.out.println("DBG Reproductor: play() -> " + rutaArchivo);
-        stopInternalNoReset(); // limpia reproducción anterior (no resetea archivoActual si queremos)
+        stopInternalNoReset();
 
         File f = new File(rutaArchivo);
         if (!f.exists()) {
@@ -52,23 +52,19 @@ public class ReproductorMP3 {
         playThread = new Thread(() -> {
             try {
                 System.out.println("DBG Reproductor: player.play() starting");
-                player.play(); // bloqueante dentro del hilo
+                player.play();
                 System.out.println("DBG Reproductor: player.play() finished normally");
             } catch (Throwable t) {
                 System.err.println("DBG Reproductor: exception en play thread: " + t);
                 t.printStackTrace();
             } finally {
                 synchronized (ReproductorMP3.this) {
-                    // Si al terminar el hilo el estado todavía era PLAYING significa que la pista
-                    // terminó "naturalmente" -> pasar a STOPPED.
-                    // Si el estado fue cambiado a PAUSED por pause(), o a STOPPED por stop(), no lo
-                    // sobreescribimos: respetamos la intención externa.
                     if (state == State.PLAYING) {
                         state = State.STOPPED;
-                        archivoActual = null; // opcional: limpiar el archivo si quieres
+                        archivoActual = null;
                     }
                     player = null;
-                    cleanupStreams(); // asegurar recursos cerrados
+                    cleanupStreams();
                 }
                 System.out.println("DBG Reproductor: play-thread finalizado (state=" + state + ")");
             }
@@ -85,7 +81,6 @@ public class ReproductorMP3 {
             return;
         }
 
-        // Guardar posición actual si podemos
         try {
             if (fis != null) {
                 FileChannel ch = fis.getChannel();
@@ -98,11 +93,9 @@ public class ReproductorMP3 {
             pausaByteOffset = 0L;
         }
 
-        // Cerrar player para detener reproducción (esto hará que el hilo salga)
         try { player.close(); } catch (Exception ignored) {}
         player = null;
 
-        // Cambiar estado a PAUSED y limpiar streams (los reabriremos en resume)
         state = State.PAUSED;
         cleanupStreams();
 
@@ -125,7 +118,6 @@ public class ReproductorMP3 {
         final long startOffset = pausaByteOffset;
         System.out.println("DBG Reproductor: resume -> offset=" + startOffset);
 
-        // reabrir streams y posicionar
         try {
             fis = new FileInputStream(archivoActual);
             FileChannel ch = fis.getChannel();
@@ -141,7 +133,6 @@ public class ReproductorMP3 {
             return;
         }
 
-        // marcar como PLAYING antes de arrancar el hilo
         state = State.PLAYING;
 
         playThread = new Thread(() -> {
@@ -154,7 +145,6 @@ public class ReproductorMP3 {
                 t.printStackTrace();
             } finally {
                 synchronized (ReproductorMP3.this) {
-                    // Igual que en play(): si el estado sigue PLAYING -> terminó naturalmente -> STOPPED.
                     if (state == State.PLAYING) {
                         state = State.STOPPED;
                         archivoActual = null;
@@ -178,7 +168,6 @@ public class ReproductorMP3 {
         pausaByteOffset = 0L;
     }
 
-    // Limpieza sin tocar state/archivoActual (uso interno por play)
     private synchronized void stopInternalNoReset() {
         if (player != null) {
             try { player.close(); } catch (Exception ignored) {}

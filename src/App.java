@@ -1,35 +1,35 @@
 import javax.swing.*;
 import javax.swing.tree.*;
-import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.RoundRectangle2D;
+import java.io.File;
 import java.util.List;
-import java.io.*;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 
+/**
+ * App con un solo botón toggle Play/Pause/Resume y un Stop separado.
+ * Reutiliza listaArtistaJson, Artista y Cancion que ya tienes.
+ */
 public class App {
 
     private List<Artista> artistas;
     private ReproductorMP3 player;
-    private Cancion cancionSeleccionada; // guarda la canción seleccionada en el árbol
+    private Cancion cancionSeleccionada;
     private JFrame frame;
     private JTree tree;
-    private JButton btnPlay, btnTogglePause, btnStop;
-    private boolean isPaused = false;
-    // label para la imagen del artista
     private JLabel lblImagen;
-
+    private JButton btnPlayPause;
+    private JButton btnStop;
+    
     public App() {
         try {
             artistas = listaArtistaJson.cargarArtistasDesdeJSON("src/datos/Artistas.json");
             if (artistas == null)
                 artistas = java.util.Collections.emptyList();
-        } catch (IOException e) {
+        } catch (Exception e) {
             artistas = java.util.Collections.emptyList();
-            JOptionPane.showMessageDialog(null, "Error cargando artistas: " + e.getMessage());
+            JOptionPane.showMessageDialog(null, "error cargando artistas: " + e.getMessage());
         }
-
         player = new ReproductorMP3();
         SwingUtilities.invokeLater(this::appUI);
     }
@@ -37,31 +37,30 @@ public class App {
     private void appUI() {
         frame = new JFrame("Reproductor de Música");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(950, 600);
+        frame.setSize(950, 650);
         frame.setLocationRelativeTo(null);
 
-        JPanel main = new JPanel(new BorderLayout(8, 8));
+        JPanel main = new JPanel(new BorderLayout(6, 11));
+        main.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         frame.setContentPane(main);
 
-        // --- LEFT: árbol ---
+        // LEFT: árbol
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Artistas");
         for (Artista a : artistas) {
             DefaultMutableTreeNode nodoArtista = new DefaultMutableTreeNode(a);
             root.add(nodoArtista);
             if (a.getCanciones() != null) {
                 for (Cancion c : a.getCanciones()) {
-                    DefaultMutableTreeNode nodoCancion = new DefaultMutableTreeNode(c);
-                    nodoArtista.add(nodoCancion);
+                    nodoArtista.add(new DefaultMutableTreeNode(c));
                 }
             }
-
         }
         DefaultTreeModel model = new DefaultTreeModel(root);
         tree = new JTree(model);
         tree.setRootVisible(false);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setShowsRootHandles(true);
-        tree.setRowHeight(24);
+        tree.setRowHeight(28);
         tree.setCellRenderer(new DefaultTreeCellRenderer() {
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value,
@@ -69,91 +68,79 @@ public class App {
                 super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
                 Object obj = node.getUserObject();
-                if (obj instanceof Artista) {
+                if (obj instanceof Artista)
                     setText(((Artista) obj).getNombre());
-                } else if (obj instanceof Cancion) {
+                else if (obj instanceof Cancion)
                     setText(((Cancion) obj).getTitulo());
-                } else {
+                else
                     setText(obj == null ? "" : obj.toString());
-                }
                 return this;
             }
         });
 
-        // --- RIGHT: detalles y controles ---
+        JScrollPane treeScroll = new JScrollPane(tree);
+        treeScroll.setPreferredSize(new Dimension(300, 0));
+        main.add(treeScroll, BorderLayout.WEST);
+
+        // RIGHT: detalles y controles
         JPanel right = new JPanel(new BorderLayout(6, 6));
         right.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        right.setBackground(Color.darkGray);
 
-        // -- arriba: imagen y detalles --
-        JPanel topDetail = new JPanel(new BorderLayout(8, 8));
         lblImagen = new JLabel();
-        lblImagen.setPreferredSize(new Dimension(400, 500));
         lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
-        lblImagen.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        topDetail.add(lblImagen, BorderLayout.WEST);
+        lblImagen.setPreferredSize(new Dimension(350, 350));
+        lblImagen.setBorder(BorderFactory.createLineBorder(Color.black));
+        right.add(lblImagen, BorderLayout.CENTER);
 
-        JPanel details = new JPanel();
-        details.setLayout(new BoxLayout(details, BoxLayout.Y_AXIS));
-        JLabel lblInfoTitulo = new JLabel("Título: -");
-        JLabel lblInfoDuracion = new JLabel("Duración: -");
-        JLabel lblInfoTiempo = new JLabel("Año: -");
-        JLabel lblInfoArtista = new JLabel("Artista: -");
-        details.add(lblInfoTitulo);
-        details.add(Box.createVerticalStrut(6));
-        details.add(lblInfoDuracion);
-        details.add(Box.createVerticalStrut(6));
-        details.add(lblInfoTiempo);
-        details.add(Box.createVerticalStrut(6));
-        details.add(lblInfoArtista);
-        topDetail.add(details, BorderLayout.CENTER);
+        // Informacion
+        JPanel info = new JPanel();
+        info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+        info.setBackground(Color.green);
+        info.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        info.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+        JLabel lblTitulo = new JLabel("Título: -");
+        JLabel lblDuracion = new JLabel("Duración: -");
+        JLabel lblAnio = new JLabel("Año: -");
+        JLabel lblArtista = new JLabel("Artista: -");
+        info.add(lblTitulo);
+        info.add(Box.createVerticalStrut(6));
+        info.add(lblDuracion);
+        info.add(Box.createVerticalStrut(6));
+        info.add(lblAnio);
+        info.add(Box.createVerticalStrut(6));
+        info.add(lblArtista);
 
-        right.add(topDetail, BorderLayout.CENTER);
+        right.add(info, BorderLayout.NORTH);
 
-        // Panel de controles (botones)
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 6));
-
-        btnPlay = crearBoton("Reproducir", e -> {
-            if (cancionSeleccionada == null) {
-                JOptionPane.showMessageDialog(frame, "Selecciona primero una canción.", "Info",
-                        JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            String ruta = cancionSeleccionada.getNombreArchivo();
-            if (ruta == null || ruta.trim().isEmpty()) {
-                int resp = JOptionPane.showConfirmDialog(frame, "No hay archivo asociado. ¿Deseas buscarlo?",
-                        "Archivo falta", JOptionPane.YES_NO_OPTION);
-                if (resp == JOptionPane.YES_OPTION) {
-                    buscarYAsignarArchivo(cancionSeleccionada);
-                }
-                return;
-            }
+        // Controles: botón toggle y stop
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 6));
+        controls.setBackground(Color.green);
+        btnPlayPause = crearBoton("Play", e -> togglePlayPause());
+        btnPlayPause.setBackground(Color.green);
+        btnPlayPause.setForeground(Color.BLACK);
+       
+        btnStop = crearBoton("Stop", e -> {
+            btnStop.setForeground(Color.BLACK); 
             player.stop();
-            player.play(ruta);
+            btnPlayPause.setText("Play");
+            btnPlayPause.setEnabled(true);
+            btnPlayPause.setBackground(Color.green);
+            btnPlayPause.setForeground(Color.BLACK);
+            btnStop.setEnabled(false);
+            
         });
+        btnStop.setEnabled(false);
+        btnStop.setBackground(Color.RED);
 
-        btnPlay = crearBoton("Reproducir", e -> onPlay());
-        btnTogglePause = crearBoton("Pausar", e -> togglePause());
-        btnTogglePause.setEnabled(false);
-        btnStop = crearBoton("Detener", e -> onStop());
-
-        // Botón extra: buscar archivo manualmente
-        JButton btnBuscarArchivo = crearBoton("Buscar archivo...", e -> {
-            if (cancionSeleccionada == null) {
-                JOptionPane.showMessageDialog(frame, "Selecciona una canción primero.", "Info",
-                        JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
-            buscarYAsignarArchivo(cancionSeleccionada);
-        });
-
-        controls.add(btnPlay);
-        controls.add(btnTogglePause);
+        controls.add(btnPlayPause);
         controls.add(btnStop);
-        controls.add(btnBuscarArchivo);
-
+        controls.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
         right.add(controls, BorderLayout.SOUTH);
 
-        // Listener del árbol (modo manual)
+        main.add(right, BorderLayout.CENTER);
+
+        // Listeners de árbol
         tree.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode sel = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             if (sel == null)
@@ -162,134 +149,92 @@ public class App {
             if (user instanceof Cancion) {
                 Cancion c = (Cancion) user;
                 cancionSeleccionada = c;
-                lblInfoTitulo.setText("Título: " + safe(c.getTitulo()));
-                lblInfoDuracion.setText("Duración: " + safe(c.getDuracion()));
-                lblInfoTiempo.setText("Año: " + safe(c.getAnio()));
-                TreeNode parent = sel.getParent();
-                if (parent instanceof DefaultMutableTreeNode) {
-                    Object p = ((DefaultMutableTreeNode) parent).getUserObject();
-                    if (p instanceof Artista) {
-                        Artista art = (Artista) p;
-                        lblInfoArtista.setText("Artista: " + art.getNombre());
-                        // mostrar imagen del artista (si existe)
-                        ImageIcon icon = loadAndScale(art.getImagen(), 400, 400);
-                        lblImagen.setIcon(icon);
-                    } else {
-                        lblInfoArtista.setText("Artista: -");
-                        lblImagen.setIcon(null);
-                    }
+                lblTitulo.setText("Título: " + safe(c.getTitulo()));
+                lblDuracion.setText("Duración: " + safe(c.getDuracion()));
+                lblAnio.setText("Año: " + safe(c.getAnio()));
+                DefaultMutableTreeNode parent = (DefaultMutableTreeNode) sel.getParent();
+                if (parent != null && parent.getUserObject() instanceof Artista) {
+                    Artista art = (Artista) parent.getUserObject();
+                    lblArtista.setText("Artista: " + art.getNombre());
+                    ImageIcon icon = loadAndScale(art.getImagen(), 350, 350);
+                    lblImagen.setIcon(icon);
                 } else {
-                    lblInfoArtista.setText("Artista: -");
+                    lblArtista.setText("Artista: -");
                     lblImagen.setIcon(null);
                 }
             } else if (user instanceof Artista) {
                 Artista a = (Artista) user;
                 cancionSeleccionada = null;
-                lblInfoTitulo.setText("Título: -");
-                lblInfoDuracion.setText("Duración: -");
-                lblInfoTiempo.setText("Año: -");
-                lblInfoArtista.setText("Artista: " + a.getNombre());
-                ImageIcon icon = loadAndScale(a.getImagen(), 400, 400);
-                lblImagen.setIcon(icon);
+                lblTitulo.setText("Título: -");
+                lblDuracion.setText("Duración: -");
+                lblAnio.setText("Año: -");
+                lblArtista.setText("Artista: " + a.getNombre());
+                lblImagen.setIcon(loadAndScale(a.getImagen(), 350, 350));
             } else {
                 cancionSeleccionada = null;
-                lblInfoTitulo.setText("Título: -");
-                lblInfoDuracion.setText("Duración: -");
-                lblInfoTiempo.setText("Año: -");
-                lblInfoArtista.setText("Artista: -");
+                lblTitulo.setText("Título: -");
+                lblDuracion.setText("Duración: -");
+                lblAnio.setText("Año: -");
+                lblArtista.setText("Artista: -");
                 lblImagen.setIcon(null);
             }
         });
 
-        JScrollPane treeScroll = new JScrollPane(tree);
-        treeScroll.setPreferredSize(new Dimension(320, 0));
-        main.add(treeScroll, BorderLayout.WEST);
-        main.add(right, BorderLayout.CENTER);
-
         frame.setVisible(true);
     }
 
-    private Cancion obtenerCancionSeleccionada() {
-        TreePath selPath = tree.getSelectionPath();
-        if (selPath == null)
-            return null;
-
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
-        if (node == null)
-            return null;
-
-        Object user = node.getUserObject();
-        if (user instanceof Cancion) {
-            return (Cancion) user;
-        }
-        return null;
-    }
-
-    private void onPlay() {
-        Cancion c = obtenerCancionSeleccionada();
-        if (c == null) {
-            JOptionPane.showMessageDialog(frame, "Selecciona una canción.");
+    // Toggle Play/Pause/Resume logic
+    private void togglePlayPause() {
+        if (cancionSeleccionada == null) {
+            JOptionPane.showMessageDialog(frame, "Selecciona primero una canción.", "Info",
+                    JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        String ruta = c.getNombreArchivo();
+        String ruta = cancionSeleccionada.getNombreArchivo();
         if (ruta == null || ruta.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "No hay archivo asociado.");
+            JOptionPane.showMessageDialog(frame, "La canción no tiene archivo asignado.", "Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
         File f = new File(ruta);
         if (!f.exists()) {
-            JOptionPane.showMessageDialog(frame, "No se encontró el archivo: " + f.getAbsolutePath());
+            JOptionPane.showMessageDialog(frame, "No se encontró el archivo: " + f.getAbsolutePath(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        player.stop();
-        player.play(ruta);
-        isPaused = false;
-        btnPlay.setEnabled(false);
-        btnTogglePause.setEnabled(true);
-        btnTogglePause.setText("Pausar");
-        btnStop.setEnabled(true);
-    }
-
-    private void togglePause() {
-        if (!isPaused) {
-            // pedir pausar
-            player.pause();
-            isPaused = true;
-            btnTogglePause.setText("Reanudar");
-            // ajuste botones
-            btnPlay.setEnabled(true); // opcional: permite volver a play desde inicio
+        // Estado: STOPPED -> iniciar; PLAYING -> pausar; PAUSED -> reanudar
+        if (!player.isPlaying() && !player.isPaused()) {
+            // start
+            player.stop();
+            player.play(ruta);
+            btnPlayPause.setText("Pause");
+            btnPlayPause.setBackground(Color.LIGHT_GRAY);
             btnStop.setEnabled(true);
-        } else {
-            // pedir reanudar
+
+        } else if (player.isPlaying()) {
+            // pause
+            player.pause();
+            btnPlayPause.setText("Resume");
+            btnPlayPause.setBackground((new Color(200, 245, 100)));
+            // mantener stop habilitado
+            btnStop.setEnabled(true);
+        } else if (player.isPaused()) {
+            // resume
             player.resume();
-            // sólo si resume efectivamente cambió el estado, asumimos que resume() lo hará
-            isPaused = false;
-            btnTogglePause.setText("Pausar");
-            btnPlay.setEnabled(false);
+            btnPlayPause.setText("Pause");
+            btnPlayPause.setBackground(Color.LIGHT_GRAY);
             btnStop.setEnabled(true);
         }
     }
 
-    private void onStop() {
-        if (player != null)
-            player.stop();
-        isPaused = false;
-        btnPlay.setEnabled(true);
-        btnTogglePause.setEnabled(false);
-        btnTogglePause.setText("Pausar");
-        btnStop.setEnabled(false);
-    }
-
-    // -------------------------
-    // MÉTODO AUXILIAR REUTILIZABLE
-    // -------------------------
     private JButton crearBoton(String texto, ActionListener action) {
         JButton boton = new JButton(texto);
         boton.setFocusable(false);
-        boton.setPreferredSize(new Dimension(120, 30));
+        boton.setPreferredSize(new Dimension(110, 30));
         boton.addActionListener(action);
-        boton.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        boton.setBorder(BorderFactory.createLineBorder(Color.black, 3));
+        boton.setFont(new Font("SansSerif", Font.BOLD, 12));
         return boton;
     }
 
@@ -297,65 +242,31 @@ public class App {
         return s == null ? "-" : s;
     }
 
-    // -------------------------
-    // Cargar y escalar imagen (soporta ruta en disco y recurso en classpath)
-    // -------------------------
     private ImageIcon loadAndScale(String path, int maxW, int maxH) {
-        if (path == null || path.trim().isEmpty()) {
+        if (path == null || path.trim().isEmpty())
             return null;
-        }
         try {
-            BufferedImage img = null;
             File f = new File(path);
             if (f.exists()) {
-                img = ImageIO.read(f);
+                ImageIcon icon = new ImageIcon(path);
+                Image img = icon.getImage().getScaledInstance(maxW, maxH, Image.SCALE_SMOOTH);
+                return new ImageIcon(img);
             } else {
-                // intentar resource dentro del JAR (path relativo)
-                InputStream in = getClass().getResourceAsStream("/" + path.replaceFirst("^/+", ""));
+                java.io.InputStream in = getClass().getResourceAsStream("/" + path.replaceFirst("^/+", ""));
                 if (in != null) {
-                    img = ImageIO.read(in);
-                    in.close();
+                    Image img = javax.imageio.ImageIO.read(in);
+                    Image scaled = img.getScaledInstance(maxW, maxH, Image.SCALE_SMOOTH);
+                    return new ImageIcon(scaled);
                 }
             }
-            if (img == null)
-                return null;
-            int w = img.getWidth();
-            int h = img.getHeight();
-            double scale = Math.min((double) maxW / w, (double) maxH / h);
-            int nw = Math.max(1, (int) (w * scale));
-            int nh = Math.max(1, (int) (h * scale));
-            Image scaled = img.getScaledInstance(nw, nh, Image.SCALE_SMOOTH);
-            return new ImageIcon(scaled);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
         }
-    }
-
-    // -------------------------
-    // Abrir JFileChooser para asignar archivo mp3 a la cancion
-    // -------------------------
-    private void buscarYAsignarArchivo(Cancion c) {
-        JFileChooser fc = new JFileChooser();
-        fc.setDialogTitle("Selecciona archivo MP3 para: " + c.getTitulo());
-        // Opcional: establecer filtro
-        fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("MP3 files", "mp3"));
-        int resp = fc.showOpenDialog(frame);
-        if (resp == JFileChooser.APPROVE_OPTION) {
-            File sel = fc.getSelectedFile();
-            c.setNombreArchivo(sel.getAbsolutePath());
-            JOptionPane.showMessageDialog(frame, "Archivo asignado:\n" + sel.getAbsolutePath(), "Archivo asignado",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
+        return null;
     }
 
     // MAIN
     public static void main(String[] args) {
-        System.out.println(">> main started");
-        try {
-            new App();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        SwingUtilities.invokeLater(App::new);
     }
 }

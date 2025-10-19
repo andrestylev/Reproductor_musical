@@ -1,38 +1,62 @@
 public class Cancion {
-    private String titulo;
-    private String duracion;
-    private String año;
-    private String genero;
+    private String Titulo;
+    private String Duracion;
+    private String anio;
+    private String Genero;
+    private String nombreArchivo;
 
+    public Cancion() {}
+
+    public Cancion(String Titulo, String Duracion, String anio, String Genero, String nombreArchivo) {
+        this.Titulo = Titulo;
+        this.Duracion = Duracion;
+        this.anio = anio;
+        this.Genero = Genero;
+        this.nombreArchivo = nombreArchivo;
+    }
     public String getTitulo() {
-        return titulo;
+        return Titulo;
     }
 
     public void setTitulo(String titulo) {
-        this.titulo = titulo;
+        Titulo = titulo;
     }
 
     public String getDuracion() {
-        return duracion;
+        return Duracion;
     }
 
-    public void setDuracion(String duracion) {
-        this.duracion = duracion;
+    public void setDuracion(String Duracion) {
+        this.Duracion = Duracion;
     }
 
-    public String getAño() {
-        return año;
+    public String getAnio() {
+        return anio;
     }
 
-    public void setAño(String año) {
-        this.año = año;
+    public void setAnio(String anio) {
+        this.anio = anio;
     }
 
     public String getGenero() {
-        return genero;
+        return Genero;
     }
 
-    public void setGenero(String genero) {
-        this.genero = genero;
+    public void setGenero(String Genero) {
+        this.Genero = Genero;
+    }
+
+    public String getNombreArchivo() {
+        return nombreArchivo;
+    }
+
+    public void setNombreArchivo(String nombreArchivo) {
+        this.nombreArchivo = nombreArchivo;
+    }
+
+    @Override
+    public String toString() {
+        return Titulo + " (" + Duracion + ", " + anio + ", " + Genero + ")";
     }
 }
+

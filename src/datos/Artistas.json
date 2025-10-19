@@ -1,0 +1,91 @@
+{
+  "artistas": [
+    {
+      "nombre": "Black Sabbath",
+      "tipo": "banda",
+      "pais": "UK",
+      "imagen": "img/black_sabbath.jpg",
+      "canciones": [
+        {
+          "titulo": "Paranoid",
+          "duracion": "2:48",
+          "anio": "1970",
+          "genero": "Heavy Metal",
+          "nombreArchivo": "musica/Black Sabbath - Paranoid.mp3"
+        },
+        {
+          "titulo": "Iron Man",
+          "duracion": "5:27",
+          "anio": "1970",
+          "genero": "Heavy Metal",
+          "nombreArchivo": "musica/Black Sabbath - Iron Man.mp3"
+        },
+        {
+          "titulo": "War Pigs",
+          "duracion": "7:54",
+          "anio": "1970",
+          "genero": "Heavy Metal",
+          "nombreArchivo": "musica/Black Sabbath - War Pigs _ Luke's Wall.mp3"
+        }
+      ]
+    },
+    {
+      "nombre": "Guns N' Roses",
+      "tipo": "banda",
+      "pais": "USA",
+      "imagen": "img/guns_n_roses.jpg",
+      "canciones": [
+        {
+          "titulo": "Sweet Child O' Mine",
+          "duracion": "5:56",
+          "anio": "1987",
+          "genero": "Rock",
+          "nombreArchivo": "musica/Guns N' Roses - Sweet Child O' Mine.mp3"
+        },
+        {
+          "titulo": "Welcome to the Jungle",
+          "duracion": "4:44",
+          "anio": "1987",
+          "genero": "Rock",
+          "nombreArchivo": "musica/Guns N' Roses - Welcome to the Jungle.mp3"
+        },
+        {
+          "titulo": "Paradise City",
+          "duracion": "6:45",
+          "anio": "1987",
+          "genero": "Rock",
+          "nombreArchivo": "musica/Guns N' Roses - Paradise City.mp3"         
+        },
+        {
+          "titulo": "November Rain",
+          "duracion": "8:57",
+          "anio": "1991",
+          "genero": "Rock",
+          "nombreArchivo": "musica/Guns N' Roses - November Rain (2022).mp3"         
+        }
+      ]
+    },
+    {
+      "nombre": "Rolling Stones",
+      "tipo": "banda",
+      "pais": "UK",
+      "imagen": "img/rolling_stones.jpg",
+      "canciones": [
+        {
+          "titulo": "Paint It Black",
+          "duracion": "3:22",
+          "anio": "1966",
+          "genero": "Rock",
+          "nombreArchivo": "musica/The Rolling Stones - Paint It, Black.mp3"
+        },
+        {
+          "titulo": "I cant Get No Satisfaction",
+          "duracion": "3:43",
+          "anio": "1966",
+          "genero": "Rock",
+          "nombreArchivo": "musica/The Rolling Stones - (I Can't Get No) Satisfaction (Mono).mp3"
+        }
+      ]
+    }
+  ]
+}

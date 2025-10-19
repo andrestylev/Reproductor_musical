@@ -4,11 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.List;
-
-/**
- * App con un solo botón toggle Play/Pause/Resume y un Stop separado.
- * Reutiliza listaArtistaJson, Artista y Cancion que ya tienes.
- */
+ 
 public class App {
 
     private List<Artista> artistas;
@@ -19,7 +15,8 @@ public class App {
     private JLabel lblImagen;
     private JButton btnPlayPause;
     private JButton btnStop;
-    
+
+    // json cargador
     public App() {
         try {
             artistas = listaArtistaJson.cargarArtistasDesdeJSON("src/datos/Artistas.json");
@@ -33,17 +30,20 @@ public class App {
         SwingUtilities.invokeLater(this::appUI);
     }
 
+    // UI
     private void appUI() {
-        frame = new JFrame("Reproductor de Música");
+        frame = new JFrame("Reproductor De Música");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(950, 650);
         frame.setLocationRelativeTo(null);
 
         JPanel main = new JPanel(new BorderLayout(6, 11));
         main.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        main.setBorder(BorderFactory.createLineBorder(Color.black, 2));
+        main.setBackground(Color.black);
         frame.setContentPane(main);
 
-        // LEFT: árbol
+        // arrbol izquierda
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Artistas");
         for (Artista a : artistas) {
             DefaultMutableTreeNode nodoArtista = new DefaultMutableTreeNode(a);
@@ -55,33 +55,58 @@ public class App {
             }
         }
         DefaultTreeModel model = new DefaultTreeModel(root);
+
         tree = new JTree(model);
         tree.setRootVisible(false);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setShowsRootHandles(true);
         tree.setRowHeight(28);
+        tree.setOpaque(true);
+        tree.setBackground(Color.darkGray);
+
         tree.setCellRenderer(new DefaultTreeCellRenderer() {
+
             @Override
             public Component getTreeCellRendererComponent(JTree tree, Object value,
                     boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
                 Object obj = node.getUserObject();
+
                 if (obj instanceof Artista)
                     setText(((Artista) obj).getNombre());
                 else if (obj instanceof Cancion)
                     setText(((Cancion) obj).getTitulo());
                 else
                     setText(obj == null ? "" : obj.toString());
+                // colores y fuentes de los nodos
+                setOpaque(true);
+
+                if (sel) {
+                    setBackground(new Color(19, 168, 2));
+                    setForeground(Color.BLACK); 
+                } else {
+                    setBackground(Color.DARK_GRAY);
+                    setForeground(Color.WHITE); 
+                }
+                
+                setFont(new Font("SansSerif", Font.BOLD, 13));
+
                 return this;
             }
         });
 
         JScrollPane treeScroll = new JScrollPane(tree);
         treeScroll.setPreferredSize(new Dimension(300, 0));
+        treeScroll.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        treeScroll.setBackground(Color.darkGray);
+        treeScroll.setForeground(Color.white);
+        treeScroll.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(new Color(19, 168, 2), 3, true),
+                "Biblioteca", JLabel.CENTER, JLabel.CENTER, new Font("SansSerif", Font.BOLD, 14), Color.white));
         main.add(treeScroll, BorderLayout.WEST);
 
-        // RIGHT: detalles y controles
+        // detalles y controles y imagen derecha
         JPanel right = new JPanel(new BorderLayout(6, 6));
         right.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         right.setBackground(Color.darkGray);
@@ -89,13 +114,13 @@ public class App {
         lblImagen = new JLabel();
         lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
         lblImagen.setPreferredSize(new Dimension(350, 350));
-        lblImagen.setBorder(BorderFactory.createLineBorder(Color.black));
+        lblImagen.setBorder(BorderFactory.createLineBorder(Color.black, 3, true));
         right.add(lblImagen, BorderLayout.CENTER);
 
         // Informacion
         JPanel info = new JPanel();
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
-        info.setBackground(Color.green);
+        info.setBackground(new Color(19, 168, 2));
         info.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         info.setBorder(BorderFactory.createLineBorder(Color.black, 1));
         JLabel lblTitulo = new JLabel("Título: -");
@@ -112,39 +137,49 @@ public class App {
 
         right.add(info, BorderLayout.NORTH);
 
-        // Controles: botón toggle y stop
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 6));
-        controls.setBackground(Color.green);
+        // Controles boton toggle y stop
+        JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT, 18, 7));
+        controls.setBackground(new Color(19, 168, 2));
+        controls.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 6));
+
         btnPlayPause = crearBoton("Play", e -> togglePlayPause());
         btnPlayPause.setBackground(Color.green);
         btnPlayPause.setForeground(Color.BLACK);
-       
+        btnPlayPause.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+        btnPlayPause.setFont(new Font("SansSerif", Font.BOLD, 14));
+
         btnStop = crearBoton("Stop", e -> {
-            btnStop.setForeground(Color.BLACK); 
+            btnStop.setForeground(Color.BLACK);
             player.stop();
             btnPlayPause.setText("Play");
             btnPlayPause.setEnabled(true);
             btnPlayPause.setBackground(Color.green);
             btnPlayPause.setForeground(Color.BLACK);
             btnStop.setEnabled(false);
-            
+
         });
+
         btnStop.setEnabled(false);
-        btnStop.setBackground(Color.RED);
+        btnStop.setBackground(Color.red);
+        btnStop.setForeground(Color.BLACK);
+        btnStop.setFont(new Font("SansSerif", Font.BOLD, 14));
 
         controls.add(btnPlayPause);
         controls.add(btnStop);
         controls.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+
         right.add(controls, BorderLayout.SOUTH);
 
         main.add(right, BorderLayout.CENTER);
 
-        // Listeners de árbol
+        // Listeners de arbol
         tree.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode sel = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+
             if (sel == null)
                 return;
             Object user = sel.getUserObject();
+
             if (user instanceof Cancion) {
                 Cancion c = (Cancion) user;
                 cancionSeleccionada = c;
@@ -152,6 +187,7 @@ public class App {
                 lblDuracion.setText("Duración: " + safe(c.getDuracion()));
                 lblAnio.setText("Año: " + safe(c.getAnio()));
                 DefaultMutableTreeNode parent = (DefaultMutableTreeNode) sel.getParent();
+
                 if (parent != null && parent.getUserObject() instanceof Artista) {
                     Artista art = (Artista) parent.getUserObject();
                     lblArtista.setText("Artista: " + art.getNombre());
@@ -169,6 +205,7 @@ public class App {
                 lblAnio.setText("Año: -");
                 lblArtista.setText("Artista: " + a.getNombre());
                 lblImagen.setIcon(loadAndScale(a.getImagen(), 350, 350));
+
             } else {
                 cancionSeleccionada = null;
                 lblTitulo.setText("Título: -");
@@ -182,7 +219,7 @@ public class App {
         frame.setVisible(true);
     }
 
-    // Toggle Play/Pause/Resume logic
+    // Toggle Play/Pause/Resume logica y validaciones
     private void togglePlayPause() {
         if (cancionSeleccionada == null) {
             JOptionPane.showMessageDialog(frame, "Selecciona primero una canción.", "Info",
@@ -218,6 +255,7 @@ public class App {
             btnPlayPause.setBackground((new Color(200, 245, 100)));
             // mantener stop habilitado
             btnStop.setEnabled(true);
+
         } else if (player.isPaused()) {
             // resume
             player.resume();
@@ -227,13 +265,14 @@ public class App {
         }
     }
 
+    // metodo que crea botones
     private JButton crearBoton(String texto, ActionListener action) {
         JButton boton = new JButton(texto);
         boton.setFocusable(false);
         boton.setPreferredSize(new Dimension(110, 30));
         boton.addActionListener(action);
         boton.setBorder(BorderFactory.createLineBorder(Color.black, 3));
-        boton.setFont(new Font("SansSerif", Font.BOLD, 12));
+        boton.setFont(new Font("SansSerif", Font.BOLD, 14));
         return boton;
     }
 
@@ -241,6 +280,7 @@ public class App {
         return s == null ? "-" : s;
     }
 
+    // cargar y escalar imagen
     private ImageIcon loadAndScale(String path, int maxW, int maxH) {
         if (path == null || path.trim().isEmpty())
             return null;

@@ -7,11 +7,14 @@ import java.nio.channels.FileChannel;
 
 /**
  * ReproductorMP3 robusto con estado (STOPPED, PLAYING, PAUSED).
- * Soporta play/pause/resume/stop con protecciones contra condiciones de carrera.
+ * Soporta play/pause/resume/stop con protecciones contra condiciones de
+ * carrera.
  */
 public class ReproductorMP3 {
 
-    private enum State { STOPPED, PLAYING, PAUSED }
+    private enum State {
+        STOPPED, PLAYING, PAUSED
+    }
 
     private Player player;
     private Thread playThread;
@@ -93,7 +96,10 @@ public class ReproductorMP3 {
             pausaByteOffset = 0L;
         }
 
-        try { player.close(); } catch (Exception ignored) {}
+        try {
+            player.close();
+        } catch (Exception ignored) {
+        }
         player = null;
 
         state = State.PAUSED;
@@ -121,7 +127,9 @@ public class ReproductorMP3 {
         try {
             fis = new FileInputStream(archivoActual);
             FileChannel ch = fis.getChannel();
-            try { ch.position(startOffset); } catch (Throwable tt) {
+            try {
+                ch.position(startOffset);
+            } catch (Throwable tt) {
                 System.err.println("DBG Reproductor: warn position failed: " + tt);
             }
             bis = new BufferedInputStream(fis);
@@ -170,11 +178,17 @@ public class ReproductorMP3 {
 
     private synchronized void stopInternalNoReset() {
         if (player != null) {
-            try { player.close(); } catch (Exception ignored) {}
+            try {
+                player.close();
+            } catch (Exception ignored) {
+            }
             player = null;
         }
         if (playThread != null && playThread.isAlive()) {
-            try { playThread.interrupt(); } catch (Exception ignored) {}
+            try {
+                playThread.interrupt();
+            } catch (Exception ignored) {
+            }
             playThread = null;
         }
         cleanupStreams();
@@ -182,16 +196,27 @@ public class ReproductorMP3 {
 
     private synchronized void cleanupStreams() {
         if (bis != null) {
-            try { bis.close(); } catch (IOException ignored) {}
+            try {
+                bis.close();
+            } catch (IOException ignored) {
+            }
             bis = null;
         }
         if (fis != null) {
-            try { fis.close(); } catch (IOException ignored) {}
+            try {
+                fis.close();
+            } catch (IOException ignored) {
+            }
             fis = null;
         }
     }
 
     // Estado público (útil para la UI)
-    public synchronized boolean isPlaying() { return state == State.PLAYING; }
-    public synchronized boolean isPaused()  { return state == State.PAUSED; }
+    public synchronized boolean isPlaying() {
+        return state == State.PLAYING;
+    }
+
+    public synchronized boolean isPaused() {
+        return state == State.PAUSED;
+    }
 }

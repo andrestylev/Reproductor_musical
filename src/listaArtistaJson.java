@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class listaArtistaJson {
+    // metodo que carga los datos del json y los convierte en una lista de artistas
     public static List<Artista> cargarArtistasDesdeJSON(String rutaArchivo) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

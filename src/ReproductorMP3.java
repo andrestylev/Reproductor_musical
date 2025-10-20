@@ -65,7 +65,7 @@ public class ReproductorMP3 {
         playThread.start();
     }
 
-    // ---------- PAUSE ----------
+    // pausar
     public synchronized void pause() {
         if (state != State.PLAYING || player == null) {
             return;
@@ -91,7 +91,7 @@ public class ReproductorMP3 {
         cleanupStreams();
     }
 
-    // ---------- RESUME ----------
+    // reanudar
     public synchronized void resume() {
         if (state != State.PAUSED) {
             return;
@@ -142,7 +142,7 @@ public class ReproductorMP3 {
         playThread.start();
     }
 
-    // ---------- STOP ----------
+    // detener
     public synchronized void stop() {
         stopInternalNoReset();
         state = State.STOPPED;
@@ -167,7 +167,7 @@ public class ReproductorMP3 {
         }
         cleanupStreams();
     }
-
+    // limpiar los streams
     private synchronized void cleanupStreams() {
         if (bis != null) {
             try {
@@ -185,7 +185,7 @@ public class ReproductorMP3 {
         }
     }
 
-    // Estado público (útil para la UI)
+    // Estado publico  
     public synchronized boolean isPlaying() {
         return state == State.PLAYING;
     }

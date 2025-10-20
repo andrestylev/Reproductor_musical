@@ -20,9 +20,7 @@ public class Cancion {
     public String getLetra() {
         return letra;
     }
-    public void setLetra(String letra) {
-        this.letra = letra;
-    }
+    
     public String getTitulo() {
         return Titulo;
     }

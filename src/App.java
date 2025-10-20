@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.List;
- 
+
 public class App {
 
     private List<Artista> artistas;
@@ -15,7 +15,12 @@ public class App {
     private JLabel lblImagen;
     private JButton btnPlayPause;
     private JButton btnStop;
-    private JButton lyrics;
+
+    private JSplitPane imageLyricsSplit;
+    private JPanel imagePanel;
+    private JScrollPane lyricsScroll;
+    private JTextArea txtLyrics;
+    private JButton btnLyrics;
 
     // json cargador
     public App() {
@@ -35,7 +40,7 @@ public class App {
     private void appUI() {
         frame = new JFrame("Reproductor De Música");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(950, 650);
+        frame.setSize(990, 650);
         frame.setLocationRelativeTo(null);
 
         JPanel main = new JPanel(new BorderLayout(6, 11));
@@ -85,12 +90,12 @@ public class App {
 
                 if (sel) {
                     setBackground(new Color(19, 168, 2));
-                    setForeground(Color.BLACK); 
+                    setForeground(Color.BLACK);
                 } else {
                     setBackground(Color.DARK_GRAY);
-                    setForeground(Color.WHITE); 
+                    setForeground(Color.WHITE);
                 }
-                
+
                 setFont(new Font("SansSerif", Font.BOLD, 13));
 
                 return this;
@@ -114,31 +119,86 @@ public class App {
 
         lblImagen = new JLabel();
         lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
+        lblImagen.setVerticalAlignment(SwingConstants.CENTER);
         lblImagen.setPreferredSize(new Dimension(350, 350));
+        lblImagen.setBackground(Color.darkGray);
         lblImagen.setBorder(BorderFactory.createLineBorder(Color.black, 3, true));
-        right.add(lblImagen, BorderLayout.CENTER);
+            //imagen del panel izquierdo
+        imagePanel = new JPanel(new BorderLayout());
+        imagePanel.setOpaque(false);
+        imagePanel.add(lblImagen, BorderLayout.CENTER);
+            //texto de las letras izquiedas
+        txtLyrics = new JTextArea();
+        txtLyrics.setEditable(false);
+        txtLyrics.setLineWrap(true);
+        txtLyrics.setWrapStyleWord(true);
+        txtLyrics.setFont(new Font("Serif", Font.PLAIN, 14));
+        txtLyrics.setForeground(Color.WHITE);
+        txtLyrics.setBackground(Color.DARK_GRAY);
+        txtLyrics.setOpaque(true);
+        txtLyrics.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        lyricsScroll = new JScrollPane(txtLyrics);
+        lyricsScroll.setPreferredSize(new Dimension(320, 350));
+        lyricsScroll.getViewport().setBackground(Color.DARK_GRAY);
+        lyricsScroll.setBackground(Color.DARK_GRAY);
+        lyricsScroll.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 80)));
+
+        JPanel placeholder = new JPanel(new BorderLayout());
+        placeholder.setBackground(Color.DARK_GRAY);
+        placeholder.setOpaque(true);
+
+        JLabel help = new JLabel("Pulsa 'Lyrics' para ver la letra", SwingConstants.CENTER);
+        help.setForeground(Color.LIGHT_GRAY);
+        help.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        placeholder.add(help, BorderLayout.CENTER);
+
+        // izquierda imagen, derecha letras
+        imageLyricsSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, imagePanel, placeholder);
+        imageLyricsSplit.setResizeWeight(0.7);
+        imageLyricsSplit.setOneTouchExpandable(true);
+        imageLyricsSplit.setBackground(Color.DARK_GRAY);
+        imageLyricsSplit.setContinuousLayout(true);
+
+        right.add(imageLyricsSplit, BorderLayout.CENTER);
+
+        btnLyrics = new JButton("Lyrics");
+        btnLyrics.setFocusable(false);
+        btnLyrics.setPreferredSize(new Dimension(90, 30));
+        btnLyrics.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+        btnLyrics.setBackground(new Color(255, 140, 0));
+
+        btnLyrics.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        btnLyrics.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btnLyrics.addActionListener(e -> {
+            toggleLyricsPanel();
+        });
+
+        JPanel panelBotonLyrics = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 10));
+        panelBotonLyrics.setOpaque(false);
+        panelBotonLyrics.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panelBotonLyrics.add(btnLyrics);
 
         // Informacion
         JPanel info = new JPanel();
-        info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
+        info.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         info.setBackground(new Color(19, 168, 2));
         info.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         info.setBorder(BorderFactory.createLineBorder(Color.black, 1));
+
         JLabel lblTitulo = new JLabel("Título: -");
         JLabel lblDuracion = new JLabel("Duración: -");
         JLabel lblAnio = new JLabel("Año: -");
         JLabel lblArtista = new JLabel("Artista: -");
-        info.add(lblTitulo);
-        info.add(Box.createVerticalStrut(6));
-        info.add(lblDuracion);
-        info.add(Box.createVerticalStrut(6));
-        info.add(lblAnio);
-        info.add(Box.createVerticalStrut(6));
-        info.add(lblArtista);
+            info.add(lblTitulo);
+            info.add(Box.createVerticalStrut(6));
+            info.add(lblDuracion);
+            info.add(Box.createVerticalStrut(6));
+            info.add(lblAnio);
+            info.add(Box.createVerticalStrut(6));
+            info.add(lblArtista);
 
-        //lyrics = crearBoton("Lyrics", e -> verLetras());
-        //lyrics.setLayout(new FlowLayout(FlowLayout.RIGHT, 18, 7));
-        //info.add(lyrics);
+        info.add(panelBotonLyrics, BorderLayout.EAST);
 
         right.add(info, BorderLayout.NORTH);
 
@@ -188,6 +248,7 @@ public class App {
             if (user instanceof Cancion) {
                 Cancion c = (Cancion) user;
                 cancionSeleccionada = c;
+
                 lblTitulo.setText("Título: " + safe(c.getTitulo()));
                 lblDuracion.setText("Duración: " + safe(c.getDuracion()));
                 lblAnio.setText("Año: " + safe(c.getAnio()));
@@ -202,6 +263,22 @@ public class App {
                     lblArtista.setText("Artista: -");
                     lblImagen.setIcon(null);
                 }
+                if (imageLyricsSplit.getRightComponent() == lyricsScroll) {
+                    String letra = c.getLetra();
+                    if (letra != null && !letra.trim().isEmpty()) {
+                        String lower = letra.toLowerCase();
+                        if (lower.endsWith(".txt") || letra.startsWith("/") || letra.startsWith("C:")
+                                || letra.startsWith("./") || letra.startsWith("..")) {
+                            loadLyricsFromFileAsync(letra);
+                        } else {
+                            txtLyrics.setText(letra);
+                            txtLyrics.setCaretPosition(0);
+                        }
+                    } else {
+                        txtLyrics.setText("No hay letras disponibles para esta canción.");
+                    }
+                }
+
             } else if (user instanceof Artista) {
                 Artista a = (Artista) user;
                 cancionSeleccionada = null;
@@ -219,6 +296,7 @@ public class App {
                 lblArtista.setText("Artista: -");
                 lblImagen.setIcon(null);
             }
+
         });
 
         frame.setVisible(true);
@@ -268,6 +346,90 @@ public class App {
             btnPlayPause.setBackground(Color.LIGHT_GRAY);
             btnStop.setEnabled(true);
         }
+    }
+
+    // Toggle panel letras
+    private void toggleLyricsPanel() {
+        if (cancionSeleccionada == null) {
+            JOptionPane.showMessageDialog(frame, "Selecciona primero una canción.", "Info",
+                    JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        boolean visible = (imageLyricsSplit.getRightComponent() == lyricsScroll);
+
+        if (visible) {
+            imageLyricsSplit.setRightComponent(new JPanel());
+             
+
+        } else {
+            String letra = cancionSeleccionada.getLetra();
+
+            if (letra != null && !letra.trim().isEmpty()) {
+                String lower = letra.trim().toLowerCase();
+                if (lower.endsWith(".txt") || letra.startsWith("/") || letra.startsWith("c:") || letra.startsWith("./")
+                        || letra.startsWith("..")) {
+                    loadLyricsFromFileAsync(letra);
+                    imageLyricsSplit.setRightComponent(lyricsScroll);
+                               
+                } else {
+                    txtLyrics.setText(letra);
+                    txtLyrics.setCaretPosition(0);
+                    imageLyricsSplit.setRightComponent(lyricsScroll);
+                    SwingUtilities.invokeLater(() -> {
+                        int w = imageLyricsSplit.getWidth();
+                      
+                        if (w > 0)
+                            imageLyricsSplit.setDividerLocation((int) (w * 0.65));
+                        
+                        });
+                }
+            } else {
+                JOptionPane.showMessageDialog(frame, "No hay letras disponibles para esta canción.", "Info",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
+    private void loadLyricsFromFileAsync(String ruta) {
+        btnLyrics.setEnabled(false);
+        txtLyrics.setText("Cargando letras...");
+        new SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() throws Exception {
+                try {
+                    java.nio.file.Path p = java.nio.file.Paths.get(ruta);
+                    if (!java.nio.file.Files.exists(p))
+                        return null;
+                    byte[] bytes = java.nio.file.Files.readAllBytes(p);
+                    return new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+                } catch (Exception ex) {
+                    return null;
+                }
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    String contenido = get();
+                    if (contenido == null || contenido.trim().isEmpty()) {
+                        txtLyrics.setText("No se encontraron letras en: " + ruta);
+                    } else {
+                        txtLyrics.setText(contenido);
+                        txtLyrics.setCaretPosition(0);
+                    }
+                } catch (Exception ex) {
+                    txtLyrics.setText("Error cargando letras: " + ex.getMessage());
+                } finally {
+                    btnLyrics.setEnabled(true);
+                    SwingUtilities.invokeLater(() -> {
+                        int w = imageLyricsSplit.getWidth();
+                        if (w > 0)
+                            imageLyricsSplit.setDividerLocation((int) (w * 0.65));
+                    });
+                }
+            }
+        }.execute();
     }
 
     // metodo que crea botones

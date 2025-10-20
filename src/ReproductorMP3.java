@@ -5,11 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 
-/**
- * ReproductorMP3 robusto con estado (STOPPED, PLAYING, PAUSED).
- * Soporta play/pause/resume/stop con protecciones contra condiciones de
- * carrera.
- */
 public class ReproductorMP3 {
 
     private enum State {
@@ -26,14 +21,12 @@ public class ReproductorMP3 {
     private String archivoActual = null;
     private long pausaByteOffset = 0L;
 
-    // ---------- PLAY ----------
+    // reproductor play
     public synchronized void play(String rutaArchivo) {
-        System.out.println("DBG Reproductor: play() -> " + rutaArchivo);
         stopInternalNoReset();
 
         File f = new File(rutaArchivo);
         if (!f.exists()) {
-            System.err.println("DBG Reproductor: archivo no existe: " + f.getAbsolutePath());
             return;
         }
 
@@ -46,19 +39,16 @@ public class ReproductorMP3 {
             bis = new BufferedInputStream(fis);
             player = new Player(bis);
         } catch (Exception e) {
-            System.err.println("DBG Reproductor: error abriendo archivo: " + e);
             cleanupStreams();
             state = State.STOPPED;
             return;
         }
 
         playThread = new Thread(() -> {
-            try {
-                System.out.println("DBG Reproductor: player.play() starting");
-                player.play();
-                System.out.println("DBG Reproductor: player.play() finished normally");
+            try {              
+                player.play();              
             } catch (Throwable t) {
-                System.err.println("DBG Reproductor: exception en play thread: " + t);
+                
                 t.printStackTrace();
             } finally {
                 synchronized (ReproductorMP3.this) {
@@ -68,8 +58,7 @@ public class ReproductorMP3 {
                     }
                     player = null;
                     cleanupStreams();
-                }
-                System.out.println("DBG Reproductor: play-thread finalizado (state=" + state + ")");
+                }               
             }
         }, "MP3-Player-Thread");
 
@@ -78,12 +67,9 @@ public class ReproductorMP3 {
 
     // ---------- PAUSE ----------
     public synchronized void pause() {
-        System.out.println("DBG Reproductor: pause() called (state=" + state + ")");
         if (state != State.PLAYING || player == null) {
-            System.out.println("DBG Reproductor: no se puede pausar si no está PLAYING");
             return;
         }
-
         try {
             if (fis != null) {
                 FileChannel ch = fis.getChannel();
@@ -92,7 +78,6 @@ public class ReproductorMP3 {
                 pausaByteOffset = 0L;
             }
         } catch (Throwable t) {
-            System.err.println("DBG Reproductor: warn al leer byte-offset: " + t);
             pausaByteOffset = 0L;
         }
 
@@ -104,38 +89,31 @@ public class ReproductorMP3 {
 
         state = State.PAUSED;
         cleanupStreams();
-
-        System.out.println("DBG Reproductor: pause -> saved byteOffset=" + pausaByteOffset + " (state=" + state + ")");
     }
 
     // ---------- RESUME ----------
     public synchronized void resume() {
-        System.out.println("DBG Reproductor: resume() called (state=" + state + ")");
         if (state != State.PAUSED) {
-            System.out.println("DBG Reproductor: resume ignorado: estado no es PAUSED");
             return;
         }
         if (archivoActual == null) {
-            System.out.println("DBG Reproductor: resume ignorado: archivoActual==null");
             state = State.STOPPED;
             return;
         }
 
         final long startOffset = pausaByteOffset;
-        System.out.println("DBG Reproductor: resume -> offset=" + startOffset);
-
         try {
             fis = new FileInputStream(archivoActual);
             FileChannel ch = fis.getChannel();
             try {
                 ch.position(startOffset);
             } catch (Throwable tt) {
-                System.err.println("DBG Reproductor: warn position failed: " + tt);
+
             }
             bis = new BufferedInputStream(fis);
             player = new Player(bis);
         } catch (Exception e) {
-            System.err.println("DBG Reproductor: error reabriendo archivo en resume: " + e);
+
             cleanupStreams();
             state = State.STOPPED;
             return;
@@ -145,11 +123,9 @@ public class ReproductorMP3 {
 
         playThread = new Thread(() -> {
             try {
-                System.out.println("DBG Reproductor: resume-thread starting");
                 player.play();
-                System.out.println("DBG Reproductor: resume-thread finished normally");
             } catch (Throwable t) {
-                System.err.println("DBG Reproductor: exception en resume thread: " + t);
+
                 t.printStackTrace();
             } finally {
                 synchronized (ReproductorMP3.this) {
@@ -160,7 +136,6 @@ public class ReproductorMP3 {
                     player = null;
                     cleanupStreams();
                 }
-                System.out.println("DBG Reproductor: resume-thread finalizado (state=" + state + ")");
             }
         }, "MP3-Resume-Thread");
 
@@ -169,7 +144,6 @@ public class ReproductorMP3 {
 
     // ---------- STOP ----------
     public synchronized void stop() {
-        System.out.println("DBG Reproductor: stop() called");
         stopInternalNoReset();
         state = State.STOPPED;
         archivoActual = null;

@@ -20,14 +20,16 @@
           "duracion": "5:27",
           "anio": "1970",
           "genero": "Heavy Metal",
-          "nombreArchivo": "musica/Black Sabbath - Iron Man.mp3"
+          "nombreArchivo": "musica/Black Sabbath - Iron Man.mp3",
+          "letra": "Lyrics/iron_man.txt"
         },
         {
           "titulo": "War Pigs",
           "duracion": "7:54",
           "anio": "1970",
           "genero": "Heavy Metal",
-          "nombreArchivo": "musica/Black Sabbath - War Pigs _ Luke's Wall.mp3"
+          "nombreArchivo": "musica/Black Sabbath - War Pigs _ Luke's Wall.mp3",
+          "letra": "Lyrics/war_pigs.txt"
         }
       ]
     },
@@ -42,28 +44,32 @@
           "duracion": "5:56",
           "anio": "1987",
           "genero": "Rock",
-          "nombreArchivo": "musica/Guns N' Roses - Sweet Child O' Mine.mp3"
+          "nombreArchivo": "musica/Guns N' Roses - Sweet Child O' Mine.mp3",
+          "letra": "Lyrics/sweet_child_ofmine.txt"
         },
         {
           "titulo": "Welcome to the Jungle",
           "duracion": "4:44",
           "anio": "1987",
           "genero": "Rock",
-          "nombreArchivo": "musica/Guns N' Roses - Welcome to the Jungle.mp3"
+          "nombreArchivo": "musica/Guns N' Roses - Welcome to the Jungle.mp3",
+          "letra": "Lyrics/welcome_to_thejungle.txt"
         },
         {
           "titulo": "Paradise City",
           "duracion": "6:45",
           "anio": "1987",
           "genero": "Rock",
-          "nombreArchivo": "musica/Guns N' Roses - Paradise City.mp3"         
+          "nombreArchivo": "musica/Guns N' Roses - Paradise City.mp3" ,
+          "letra": "Lyrics/paradise_city.txt"        
         },
         {
           "titulo": "November Rain",
           "duracion": "8:57",
           "anio": "1991",
           "genero": "Rock",
-          "nombreArchivo": "musica/Guns N' Roses - November Rain (2022).mp3"         
+          "nombreArchivo": "musica/Guns N' Roses - November Rain (2022).mp3",
+          "letra": "Lyrics/november_rain.txt"      
         }
       ]
     },
@@ -78,14 +84,16 @@
           "duracion": "3:22",
           "anio": "1966",
           "genero": "Rock",
-          "nombreArchivo": "musica/The Rolling Stones - Paint It, Black.mp3"
+          "nombreArchivo": "musica/The Rolling Stones - Paint It, Black.mp3",
+          "letra": "Lyrics/paint_itblack.txt"
         },
         {
           "titulo": "I cant Get No Satisfaction",
           "duracion": "3:43",
           "anio": "1966",
           "genero": "Rock",
-          "nombreArchivo": "musica/The Rolling Stones - (I Can't Get No) Satisfaction (Mono).mp3"
+          "nombreArchivo": "musica/The Rolling Stones - (I Can't Get No) Satisfaction (Mono).mp3",
+          "letra": "Lyrics/i_cant_getno_satisfaction.txt"
         }
       ]
     }
